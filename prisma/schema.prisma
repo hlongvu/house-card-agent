@@ -1,0 +1,139 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id        String        @id @default(cuid())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  title     String
+  region    String        @default("VN-HCM")
+  status    ProjectStatus @default(UPLOADED)
+  inputFile    InputFile?
+  designSpec   DesignSpec?
+  boq          BillOfQuantities?
+  marketData   MarketData?
+  schedule     Schedule?
+  report       Report?
+  agentRuns    AgentRun[]
+}
+
+enum ProjectStatus {
+  UPLOADED
+  PARSING
+  QUANTIFYING
+  RESEARCHING
+  SCHEDULING
+  ESTIMATING
+  COMPLETED
+  FAILED
+}
+
+model InputFile {
+  id          String  @id @default(cuid())
+  projectId   String  @unique
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  filename    String
+  mimeType    String
+  sizeBytes   Int
+  storagePath String
+  sha256      String
+}
+
+model DesignSpec {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  rawJson   Json
+  summary   String?
+  gfaM2     Float?
+  rooms     Int?
+  levels    Int?
+}
+
+model BillOfQuantities {
+  id         String  @id @default(cuid())
+  projectId  String  @unique
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items      Json
+  totalItems Int
+}
+
+model MarketData {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  prices    Json
+  labor     Json
+  fetchedAt DateTime @default(now())
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  projectId    String   @unique
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  costJson     Json
+  timelineJson Json
+  risks        Json
+  materials    Json     @default("[]")
+  labor        Json     @default("[]")
+  citations    Json     @default("[]")
+  markdown     String
+  assumptions  Json     @default("[]")
+  createdAt    DateTime @default(now())
+}
+
+model Schedule {
+  id            String   @id @default(cuid())
+  projectId     String   @unique
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  phases        Json
+  totalDurationDays Int
+  startDate     String?
+  endDate       String?
+  criticalPath  Json     @default("[]")
+  riskFactors   Json     @default("[]")
+  notes         Json     @default("[]")
+  createdAt     DateTime @default(now())
+}
+
+model AgentDefinition {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  version   Int
+  prompt    String
+  tools     Json
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  runs      AgentRun[]
+}
+
+model AgentRun {
+  id           String         @id @default(cuid())
+  projectId    String
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  definitionId String
+  definition   AgentDefinition @relation(fields: [definitionId], references: [id])
+  agentName    String
+  status       AgentRunStatus @default(PENDING)
+  input        Json
+  output       Json?
+  error        String?
+  attempts     Int            @default(0)
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  createdAt    DateTime       @default(now())
+
+  @@index([projectId, agentName])
+}
+
+enum AgentRunStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
