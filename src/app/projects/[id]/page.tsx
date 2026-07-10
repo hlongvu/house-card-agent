@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import AgentStatusList from "@/components/AgentStatusList";
+import AutoRetryFailed from "@/components/AutoRetryFailed";
 import Link from "next/link";
 
 async function getProject(id: string) {
@@ -65,6 +66,8 @@ export default async function ProjectDetailPage({
             &larr; Back to projects
           </Link>
         </div>
+
+        <AutoRetryFailed projectId={project.id} status={project.status} />
 
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">

@@ -39,7 +39,7 @@ export const marketResearchAgent = new Agent<MarketResearchInput, MarketData, un
 
     const searchContext = searchResults
       .slice(0, 20)
-      .map((r) => `- ${r.title}: ${r.snippet}`)
+      .map((r) => `- [${r.title}](${r.url}): ${r.snippet}`)
       .join("\n");
 
     const userPrompt = `

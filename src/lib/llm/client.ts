@@ -33,6 +33,26 @@ const client = new OpenAI({
   baseURL: getBaseURL(),
 });
 
+function deepFixRequired(schema: unknown): unknown {
+  if (Array.isArray(schema)) {
+    return schema.map(deepFixRequired);
+  }
+  if (typeof schema !== "object" || schema === null) {
+    return schema;
+  }
+  const obj = schema as Record<string, unknown>;
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (key === "required" && obj.properties && typeof obj.properties === "object") {
+      const props = obj.properties as Record<string, unknown>;
+      result[key] = Object.keys(props);
+    } else {
+      result[key] = deepFixRequired(value);
+    }
+  }
+  return result;
+}
+
 export async function callLLM(
   prompt: string,
   tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
@@ -117,6 +137,9 @@ export async function callLLMStructured<T>(
     }
   }
 
+  // OpenAI strict mode requires every property to be in `required`.
+  const strictSchema = deepFixRequired(jsonSchema);
+
   // OpenAI / compatible providers with json_schema support
   const response = await client.chat.completions.create({
     model,
@@ -127,7 +150,7 @@ export async function callLLMStructured<T>(
       json_schema: {
         name: "result",
         strict: true,
-        schema: jsonSchema,
+        schema: strictSchema,
       },
     },
   });

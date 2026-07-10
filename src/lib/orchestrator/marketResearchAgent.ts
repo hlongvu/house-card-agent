@@ -42,7 +42,7 @@ export async function runMarketResearchAgent(runId: string, _dbInstance: PrismaC
 
   const searchContext = searchResults
     .slice(0, 20)
-    .map((r) => `- ${r.title}: ${r.snippet}`)
+    .map((r) => `- [${r.title}](${r.url}): ${r.snippet}`)
     .join("\n");
 
   const systemPrompt = `You are a construction market analyst specializing in Vietnam. Given a bill of quantities and web search results, compile current market unit prices and labor rates for the region. 
