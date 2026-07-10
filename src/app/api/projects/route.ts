@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { runPipeline } from "@/lib/orchestrator";
+import { runPipeline } from "@/lib/orchestrator/pipeline";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";

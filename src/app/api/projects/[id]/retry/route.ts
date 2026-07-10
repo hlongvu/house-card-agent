@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { runPipeline } from "@/lib/orchestrator";
+import { runPipeline } from "@/lib/orchestrator/pipeline";
 
 export const dynamic = "force-dynamic";
 
