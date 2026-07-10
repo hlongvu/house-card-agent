@@ -4,9 +4,7 @@ A multi-agent AI system that turns CAD drawings, PDFs, and floorplan images into
 
 Upload a `.dwg`, `.dxf`, `.pdf`, or image of a building plan. A pipeline of five specialized agents reads the design, generates a bill of quantities, researches current market prices, drafts a construction schedule, and produces a final cost report — all in VND.
 
-[Video walkthrough](https://github.com/user-attachments/assets/PLACEHOLDER)
-
-<video src="https://github.com/hlongvu/house-card-agent/raw/main/FILE/house_card_design.mp4" controls></video>
+https://github.com/user-attachments/assets/93a98fd4-d5dc-4388-9959-22ab8274f7fd
 
 ## How It Works
 
