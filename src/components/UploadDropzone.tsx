@@ -68,15 +68,18 @@ export default function UploadDropzone({
     }
   };
 
+  const acceptedFormats =
+    ".dwg,.dxf,.pdf,.skp,.jpg,.jpeg,.png,.bmp,.glb,.gltf,.obj";
+
   return (
     <div className="w-full">
-      <div
-        className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-12 transition-colors cursor-pointer
-          ${dragActive
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30"
-            : "border-zinc-300 dark:border-zinc-600 hover:border-blue-400"}
-          ${uploading ? "pointer-events-none opacity-60" : ""}
-        `}
+      <button
+        type="button"
+        className={`relative w-full overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
+          dragActive
+            ? "border-terracotta-500 bg-terracotta-50/80 shadow-lg scale-[1.02]"
+            : "border-dashed border-stone-300 bg-white/60 hover:border-stone-400 hover:bg-white/80 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900/50 dark:hover:border-zinc-600"
+        } ${uploading ? "pointer-events-none opacity-70" : ""}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -87,42 +90,98 @@ export default function UploadDropzone({
           ref={inputRef}
           type="file"
           className="hidden"
-          accept=".dwg,.dxf,.pdf,.skp,.jpg,.jpeg,.png,.bmp,.glb,.gltf,.obj"
+          accept={acceptedFormats}
           onChange={handleChange}
         />
 
-        {uploading ? (
-          <>
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-blue-600" />
-            <p className="mt-3 text-sm text-zinc-500">Uploading and analyzing...</p>
-          </>
-        ) : (
-          <>
-            <svg
-              className="h-10 w-10 text-zinc-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16"
-              />
-            </svg>
-            <p className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-              Drop your CAD / PDF / image file here
-            </p>
-            <p className="mt-1 text-xs text-zinc-400">
-              or click to browse (.dwg, .dxf, .pdf, .skp, .jpg, .png, .glb up to 25MB)
-            </p>
-          </>
-        )}
-      </div>
+        <div className="relative flex flex-col items-center justify-center px-8 py-14">
+          {/* Grid background accent */}
+          <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.06]" />
+
+          {uploading ? (
+            <>
+              <div className="relative flex h-14 w-14 items-center justify-center">
+                <div className="absolute inset-0 animate-spin rounded-full border-2 border-stone-200 dark:border-zinc-700" />
+                <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-terracotta-500" />
+                <svg
+                  className="relative h-6 w-6 text-terracotta-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"
+                  />
+                </svg>
+              </div>
+              <p className="mt-4 text-sm font-medium text-stone-600 dark:text-zinc-300">
+                Analyzing your design...
+              </p>
+              <p className="mt-1 text-xs text-stone-400 dark:text-zinc-500">
+                Processing file and extracting design data
+              </p>
+            </>
+          ) : (
+            <>
+              <div
+                className={`flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-300 ${
+                  dragActive
+                    ? "bg-terracotta-100 text-terracotta-600 shadow-inner"
+                    : "bg-stone-100 text-stone-400 dark:bg-zinc-800 dark:text-zinc-500"
+                }`}
+              >
+                <svg
+                  className="h-7 w-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16"
+                  />
+                </svg>
+              </div>
+
+              <p className="mt-5 text-base font-semibold text-stone-700 dark:text-zinc-200">
+                {dragActive
+                  ? "Drop your file here"
+                  : "Drop your CAD or blueprint file"}
+              </p>
+              <p className="mt-1.5 text-sm text-stone-400 dark:text-zinc-500">
+                or click to browse your files
+              </p>
+
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+                {[".dwg", ".dxf", ".pdf", ".skp", ".jpg", ".glb"].map(
+                  (fmt) => (
+                    <span
+                      key={fmt}
+                      className="rounded-md bg-stone-100 px-2 py-0.5 text-[11px] font-medium text-stone-500 dark:bg-zinc-800 dark:text-zinc-400"
+                    >
+                      {fmt}
+                    </span>
+                  )
+                )}
+              </div>
+
+              <p className="mt-3 text-[11px] text-stone-300 dark:text-zinc-600">
+                Up to 25 MB
+              </p>
+            </>
+          )}
+        </div>
+      </button>
 
       {error && (
-        <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <div className="mt-3 animate-slide-up rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 dark:border-red-800/50 dark:bg-red-950/20">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
       )}
     </div>
   );

@@ -1,23 +1,177 @@
 @import "tailwindcss";
 
-:root {
-  --background: #fafafa;
-  --foreground: #18181b;
+@theme inline {
+  --color-stone-50: #faf9f6;
+  --color-stone-100: #f3efea;
+  --color-stone-200: #e7e1da;
+  --color-stone-300: #d2c9bf;
+  --color-stone-400: #b0a59a;
+  --color-stone-500: #8b7e74;
+  --color-terracotta-50: #fdf8f4;
+  --color-terracotta-100: #fceee4;
+  --color-terracotta-200: #f7d8bf;
+  --color-terracotta-300: #f0ba8c;
+  --color-terracotta-400: #e8995a;
+  --color-terracotta-500: #d47a34;
+  --color-terracotta-600: #b85c38;
+  --color-terracotta-700: #9a462d;
+  --color-terracotta-800: #7c3a2a;
+  --color-terracotta-900: #663225;
+  --color-slate-blue-600: #3b5998;
+  --color-slate-blue-700: #2d4575;
+  --color-sage-50: #f4faf6;
+  --color-sage-100: #e2f1e8;
+  --color-sage-400: #5cad7a;
+  --color-sage-500: #448f61;
+  --color-sage-600: #357349;
+  --color-charcoal-800: #2d2a26;
+  --color-charcoal-900: #1c1a17;
+  --color-cream: #fbf8f4;
+  --color-warm-white: #fefdfb;
+  --color-ink: #3c3832;
+  --radius-card: 1rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+:root {
+  --grid-color: rgba(180, 165, 154, 0.12);
+  --grid-size: 28px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090b;
-    --foreground: #f4f4f5;
+    --grid-color: rgba(255, 255, 255, 0.04);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-zinc-300) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-zinc-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-zinc-400);
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-zinc-600);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-zinc-500);
+  }
+}
+
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+.bg-arch-blueprint {
+  background-color: #1a2740;
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.card-elevated {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    0 8px 32px rgba(0, 0, 0, 0.03);
+}
+
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-elevated {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-glass {
+    background: rgba(30, 28, 26, 0.7);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 92, 56, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(184, 92, 56, 0); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.arch-line {
+  position: relative;
+}
+
+.arch-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-terracotta-300), var(--color-terracotta-200), transparent);
+  opacity: 0.6;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media (prefers-color-scheme: dark) {
+  .arch-line::before {
+    background: linear-gradient(90deg, var(--color-terracotta-700), var(--color-terracotta-800), transparent);
+  }
 }

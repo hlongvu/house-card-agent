@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "CAD Design Analyzer",
-  description: "Upload CAD files to estimate construction costs, timelines, and materials",
+  title: "House Plan Analyzer",
+  description:
+    "Upload CAD files to estimate construction costs, timelines, and materials",
 };
 
 export default function RootLayout({
@@ -13,8 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-        {children}
+      <body className="min-h-full flex flex-col bg-cream text-ink dark:bg-charcoal-900 dark:text-stone-100">
+        <Navbar />
+        <main className="flex flex-1 flex-col">{children}</main>
       </body>
     </html>
   );

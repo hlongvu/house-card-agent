@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 import CostTable from "@/components/CostTable";
+import TimelineView from "@/components/TimelineView";
+import PrintButton from "@/components/PrintButton";
 import Link from "next/link";
 
 export default async function ReportPage({
@@ -17,12 +19,25 @@ export default async function ReportPage({
     return (
       <div className="flex flex-1 items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-zinc-500">Report not available yet.</p>
+          <p className="text-stone-500">Report not available yet.</p>
           <Link
             href={`/projects/${id}`}
-            className="mt-2 inline-block text-sm text-blue-600 hover:text-blue-800"
+            className="mt-3 inline-flex items-center gap-1 text-sm text-terracotta-600 hover:text-terracotta-700"
           >
-            &larr; Back to project
+            <svg
+              className="h-3 w-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to project
           </Link>
         </div>
       </div>
@@ -31,156 +46,274 @@ export default async function ReportPage({
 
   const costJson = report.costJson as any;
   const timelineJson = report.timelineJson as any;
-  const risks = report.risks as any[];
+  const risks = (report.risks as any[]) || [];
   const materials = (report.materials as any[]) || [];
   const laborData = (report.labor as any[]) || [];
   const citations = (report.citations as any[]) || [];
   const assumptions = (report.assumptions as any[]) || [];
 
   return (
-    <div className="flex flex-1 flex-col px-4 py-8">
-      <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-6">
+    <div className="flex flex-1 flex-col">
+      {/* Header */}
+      <header className="border-b border-stone-200/60 bg-white dark:border-zinc-800/60 dark:bg-charcoal-900">
+        <div className="mx-auto max-w-4xl px-4 pb-6 pt-6">
           <Link
             href={`/projects/${id}`}
-            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+            className="group mb-4 inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 transition-colors hover:text-terracotta-600 dark:text-zinc-400 dark:hover:text-terracotta-400"
           >
-            &larr; Back to project
+            <svg
+              className="h-3 w-3 transition-transform group-hover:-translate-x-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to project
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-            {project.title} — Report
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Generated {new Date(report.createdAt).toLocaleString()}
-          </p>
-        </div>
 
-        {/* Markdown Summary */}
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="rounded-full bg-sage-50 px-2.5 py-1 text-[11px] font-semibold text-sage-600 dark:bg-sage-950/30 dark:text-sage-400">
+                  Final Report
+                </span>
+                <span className="text-xs text-stone-400 dark:text-zinc-500">
+                  Generated {new Date(report.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <h1 className="font-serif text-2xl font-bold tracking-tight text-charcoal-800 dark:text-stone-100 sm:text-3xl">
+                {project.title}
+              </h1>
+            </div>
+
+            <PrintButton />
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto w-full max-w-4xl space-y-8 px-4 pb-16 pt-8">
+        {/* Executive Summary */}
         {report.markdown && (
-          <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-              Executive Summary
-            </h2>
-            <div
-              className="prose prose-sm max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{
-                __html: report.markdown
-                  .replace(/\n/g, "<br/>")
-                  .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                  .replace(/## (.*)/g, "<h3 class='font-semibold mt-4 mb-2'>$1</h3>"),
-              }}
-            />
+          <section className="relative overflow-hidden rounded-2xl border border-stone-200/80 bg-white p-6 card-elevated dark:border-zinc-800 dark:bg-charcoal-800">
+            <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-terracotta-100/40 blur-3xl dark:bg-terracotta-900/10" />
+            <div className="relative">
+              <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-stone-400 dark:text-zinc-500">
+                Executive Summary
+              </h2>
+              <div
+                className="prose prose-sm max-w-none text-stone-600 dark:text-zinc-300 dark:prose-invert prose-headings:font-serif prose-headings:font-semibold prose-headings:text-charcoal-800 dark:prose-headings:text-stone-100 prose-strong:text-charcoal-800 dark:prose-strong:text-stone-100 prose-strong:font-semibold"
+                dangerouslySetInnerHTML={{
+                  __html: report.markdown
+                    .replace(/\n/g, "<br/>")
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                    .replace(
+                      /## (.*)/g,
+                      "<h3 class='font-serif text-lg font-semibold mt-5 mb-2 text-charcoal-800 dark:text-stone-100'>$1</h3>"
+                    ),
+                }}
+              />
+            </div>
           </section>
         )}
 
         {/* Cost Breakdown */}
-        <section className="mb-8">
-          <h2 className="mb-4 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-            Cost Breakdown
-          </h2>
-          <CostTable cost={costJson} />
-        </section>
+        {costJson && (
+          <section>
+            <SectionHeader
+              title="Cost Breakdown"
+              subtitle="Detailed line items grouped by category"
+            />
+            <CostTable cost={costJson} />
+          </section>
+        )}
 
         {/* Construction Schedule */}
         {schedule && (
-          <ScheduleSection
-            schedule={{
-              id: schedule.id,
-              phases: (schedule.phases as any[]) || [],
-              totalDurationDays: schedule.totalDurationDays,
-              startDate: schedule.startDate,
-              endDate: schedule.endDate,
-              criticalPath: (schedule.criticalPath as any[]) || [],
-              riskFactors: (schedule.riskFactors as any[]) || [],
-              notes: (schedule.notes as any[]) || [],
-            }}
-          />
+          <section>
+            <SectionHeader
+              title="Construction Schedule"
+              subtitle={`${schedule.totalDurationDays} days · ${(schedule.totalDurationDays / 30).toFixed(1)} months`}
+            />
+            <TimelineView
+              timeline={{
+                totalDays: schedule.totalDurationDays,
+                phases:
+                  (schedule.phases as any[])?.map((p) => ({
+                    name: p.name,
+                    startDay: p.startDay,
+                    durationDays: p.durationDays,
+                    endDay: p.endDay,
+                    description: p.description,
+                    laborByTrade: p.laborByTrade,
+                  })) || [],
+              }}
+            />
+
+            {/* Critical path */}
+            {schedule.criticalPath &&
+              (schedule.criticalPath as string[]).length > 0 && (
+                <div className="mt-4 rounded-xl border border-red-200/80 bg-red-50/50 p-4 dark:border-red-800/40 dark:bg-red-950/20">
+                  <h3 className="mb-2 text-sm font-semibold text-red-700 dark:text-red-400">
+                    Critical Path
+                  </h3>
+                  <p className="font-mono text-sm text-stone-700 dark:text-zinc-300">
+                    {(schedule.criticalPath as string[]).join(" → ")}
+                  </p>
+                  <p className="mt-1 text-xs text-stone-500 dark:text-zinc-500">
+                    Delays in any of these phases will extend project completion.
+                  </p>
+                </div>
+              )}
+
+            {/* Schedule risk factors */}
+            {schedule.riskFactors && (schedule.riskFactors as any[]).length > 0 && (
+              <div className="mt-4 rounded-xl border border-stone-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-charcoal-800">
+                <h3 className="mb-3 text-sm font-semibold text-charcoal-800 dark:text-stone-200">
+                  Schedule Risks
+                </h3>
+                <ul className="space-y-2">
+                  {(schedule.riskFactors as any[]).map(
+                    (r: any, i: number) => (
+                      <RiskItem key={i} r={r} />
+                    )
+                  )}
+                </ul>
+              </div>
+            )}
+          </section>
         )}
 
-        {/* Cost Timeline (high-level from estimator) */}
-        <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-          <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-            Cost Timeline Summary
-          </h2>
-          {timelineJson?.phases && timelineJson.phases.length > 0 ? (
-            <div className="space-y-2">
+        {/* Cost Timeline Summary (from estimator) */}
+        {timelineJson?.phases && timelineJson.phases.length > 0 && (
+          <section className="rounded-2xl border border-stone-200/80 bg-white p-6 dark:border-zinc-800 dark:bg-charcoal-800">
+            <SectionHeader
+              title="Phase Effort"
+              subtitle="Man-days allocated per construction phase"
+              inline
+            />
+            <div className="mt-4 space-y-2">
               {timelineJson.phases.map((phase: any, i: number) => {
-                const total = phase.laborByTrade?.reduce(
-                  (s: number, l: any) => s + l.manDays, 0) || 0;
+                const total =
+                  phase.laborByTrade?.reduce(
+                    (s: number, l: any) => s + l.manDays,
+                    0
+                  ) || 0;
                 return (
-                  <div key={i} className="flex items-center gap-3 text-sm border-b border-zinc-100 dark:border-zinc-800 py-1">
-                    <span className="font-medium text-zinc-700 dark:text-zinc-300 w-40">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-lg bg-stone-50 px-4 py-2.5 text-sm dark:bg-zinc-900/40"
+                  >
+                    <span className="font-medium text-charcoal-800 dark:text-stone-200">
                       {phase.name}
                     </span>
-                    <span className="text-zinc-500 text-xs">
-                      Day {phase.startDay}–{phase.endDay} ({phase.durationDays}d)
-                    </span>
-                    {total > 0 && (
-                      <span className="text-zinc-400 text-xs">
-                        {total} man-days
+                    <div className="flex items-center gap-3 text-xs text-stone-500 dark:text-zinc-400">
+                      <span className="font-mono">
+                        Day {phase.startDay}–{phase.endDay}
                       </span>
-                    )}
+                      {total > 0 && (
+                        <span className="rounded-full bg-white px-2 py-0.5 font-mono dark:bg-charcoal-800">
+                          {total} md
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <p className="text-sm text-zinc-500">No timeline data available.</p>
-          )}
-        </section>
+          </section>
+        )}
 
         {/* Materials */}
         {materials.length > 0 && (
-          <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-              Materials Summary
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="bg-zinc-50 dark:bg-zinc-800">
-                  <tr>
-                    <th className="px-3 py-2 text-left font-medium">Category</th>
-                    <th className="px-3 py-2 text-left font-medium">Item</th>
-                    <th className="px-3 py-2 text-right font-medium">Qty</th>
-                    <th className="px-3 py-2 text-left font-medium">Unit</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {materials.map((m: any, i: number) => (
-                    <tr key={i}>
-                      <td className="px-3 py-2 text-zinc-500">{m.category}</td>
-                      <td className="px-3 py-2 text-zinc-800 dark:text-zinc-200">
-                        {m.item}
-                      </td>
-                      <td className="px-3 py-2 text-right text-zinc-800 dark:text-zinc-200">
-                        {m.qty}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-500">{m.unit}</td>
+          <section>
+            <SectionHeader
+              title="Materials"
+              subtitle={`${materials.length} line items across all categories`}
+            />
+            <div className="overflow-hidden rounded-xl border border-stone-200/80 bg-white dark:border-zinc-800 dark:bg-charcoal-800">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-stone-100 bg-stone-50/50 text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:border-zinc-700/50 dark:bg-zinc-900/30 dark:text-zinc-500">
+                      <th className="px-5 py-2.5 text-left">Category</th>
+                      <th className="px-3 py-2.5 text-left">Item</th>
+                      <th className="px-3 py-2.5 text-right">Qty</th>
+                      <th className="px-5 py-2.5 text-left">Unit</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {materials.map((m: any, i: number) => (
+                      <tr
+                        key={i}
+                        className="border-b border-stone-50 last:border-0 hover:bg-stone-50/50 dark:border-zinc-800/50 dark:hover:bg-zinc-800/30"
+                      >
+                        <td className="px-5 py-2.5">
+                          <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-600 dark:bg-zinc-800 dark:text-zinc-300">
+                            {m.category}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2.5 text-stone-700 dark:text-zinc-300">
+                          {m.item}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-mono text-xs font-semibold text-charcoal-800 dark:text-stone-200">
+                          {m.qty}
+                        </td>
+                        <td className="px-5 py-2.5 text-stone-500 dark:text-zinc-400">
+                          {m.unit}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
         )}
 
         {/* Labor */}
         {laborData.length > 0 && (
-          <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-              Labor Summary
-            </h2>
-            <div className="grid gap-2 sm:grid-cols-2">
+          <section>
+            <SectionHeader
+              title="Labor"
+              subtitle="Trade allocations across the project"
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
               {laborData.map((l: any, i: number) => (
                 <div
                   key={i}
-                  className="flex justify-between rounded border border-zinc-200 dark:border-zinc-700 p-3"
+                  className="flex items-center justify-between rounded-xl border border-stone-200/80 bg-white p-4 dark:border-zinc-800 dark:bg-charcoal-800"
                 >
-                  <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                    {l.trade}
-                  </span>
-                  <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                    {l.manDays} man-days
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sage-50 text-sage-600 dark:bg-sage-950/30 dark:text-sage-400">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-medium text-charcoal-800 dark:text-stone-200">
+                      {l.trade}
+                    </span>
+                  </div>
+                  <span className="font-mono text-sm font-semibold text-stone-500 dark:text-zinc-400">
+                    {l.manDays}{" "}
+                    <span className="text-xs font-normal text-stone-400 dark:text-zinc-500">
+                      man-days
+                    </span>
                   </span>
                 </div>
               ))}
@@ -190,55 +323,52 @@ export default async function ReportPage({
 
         {/* Risks */}
         {risks.length > 0 && (
-          <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-              Risks &amp; Mitigations
-            </h2>
+          <section>
+            <SectionHeader
+              title="Risks & Mitigations"
+              subtitle={`${risks.length} identified risk${risks.length !== 1 ? "s" : ""}`}
+            />
             <ul className="space-y-2">
-              {risks.map((r: any, i: number) => {
-                const levelColors: Record<string, string> = {
-                  low: "bg-yellow-100 text-yellow-800",
-                  medium: "bg-orange-100 text-orange-800",
-                  high: "bg-red-100 text-red-800",
-                };
-                return (
-                  <li key={i} className="rounded border border-zinc-200 dark:border-zinc-700 p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${levelColors[r.level] || "bg-zinc-100 text-zinc-700"}`}
-                      >
-                        {r.level}
-                      </span>
-                      <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                        {r.title}
-                      </span>
-                    </div>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {r.description}
-                    </p>
-                  </li>
-                );
-              })}
+              {risks.map((r: any, i: number) => (
+                <RiskItem key={i} r={r} expanded />
+              ))}
             </ul>
           </section>
         )}
 
-        {/* Citations */}
+        {/* Sources */}
         {citations.length > 0 && (
-          <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-              Sources &amp; Citations
-            </h2>
-            <ul className="space-y-1">
+          <section>
+            <SectionHeader
+              title="Sources & Citations"
+              subtitle={`${citations.length} reference${citations.length !== 1 ? "s" : ""} from market research`}
+            />
+            <ul className="space-y-1.5">
               {citations.map((c: any, i: number) => (
-                <li key={i}>
+                <li
+                  key={i}
+                  className="rounded-lg border border-stone-200/80 bg-white px-4 py-2.5 dark:border-zinc-800 dark:bg-charcoal-800"
+                >
                   <a
                     href={c.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 hover:underline"
+                    className="group flex items-center gap-2 text-sm text-terracotta-600 transition-colors hover:text-terracotta-700 dark:text-terracotta-400 dark:hover:text-terracotta-300"
                   >
-                    {c.title}
+                    <svg
+                      className="h-3.5 w-3.5 shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                    <span className="truncate">{c.title}</span>
                   </a>
                 </li>
               ))}
@@ -248,13 +378,17 @@ export default async function ReportPage({
 
         {/* Assumptions */}
         {assumptions.length > 0 && (
-          <section className="mb-8 rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-              Assumptions
-            </h2>
-            <ul className="list-inside list-disc space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <section>
+            <SectionHeader title="Assumptions" inline />
+            <ul className="mt-4 space-y-1.5 rounded-xl border border-stone-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-charcoal-800">
               {assumptions.map((a: string, i: number) => (
-                <li key={i}>{a}</li>
+                <li
+                  key={i}
+                  className="flex gap-2 text-sm text-stone-600 dark:text-zinc-300"
+                >
+                  <span className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-stone-400 dark:bg-zinc-600" />
+                  <span>{a}</span>
+                </li>
               ))}
             </ul>
           </section>
@@ -264,252 +398,60 @@ export default async function ReportPage({
   );
 }
 
-// ── Schedule Section ──
+// ── Shared UI ──
 
-type ScheduleData = {
-  id: string;
-  phases: any[];
-  totalDurationDays: number;
-  startDate: string | null;
-  endDate: string | null;
-  criticalPath: any[];
-  riskFactors: any[];
-  notes: any[];
-};
+function SectionHeader({
+  title,
+  subtitle,
+  inline = false,
+}: {
+  title: string;
+  subtitle?: string;
+  inline?: boolean;
+}) {
+  return (
+    <div className={inline ? "" : "mb-4"}>
+      <h2 className="font-serif text-xl font-semibold text-charcoal-800 dark:text-stone-100">
+        {title}
+      </h2>
+      {subtitle && (
+        <p className="mt-1 text-sm text-stone-500 dark:text-zinc-400">
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+}
 
-const categoryColors: Record<string, string> = {
-  "site-prep": "bg-gray-500",
-  foundation: "bg-amber-600",
-  structure: "bg-blue-500",
-  roofing: "bg-orange-500",
-  "mep-rough": "bg-yellow-500",
-  plaster: "bg-teal-500",
-  tile: "bg-cyan-500",
-  finish: "bg-purple-500",
-  handover: "bg-green-500",
-};
-
-function ScheduleSection({ schedule }: { schedule: ScheduleData }) {
-  const phases = schedule.phases || [];
-  const total = schedule.totalDurationDays || 0;
-  const criticalPath = (schedule.criticalPath as string[]) || [];
-  const riskFactors = (schedule.riskFactors as any[]) || [];
-  const notes = (schedule.notes as string[]) || [];
-
-  const fmtDate = (iso: string | null) => {
-    if (!iso) return "—";
-    try {
-      return new Date(iso).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-    } catch {
-      return iso;
-    }
+function RiskItem({ r, expanded = false }: { r: any; expanded?: boolean }) {
+  const levelColors: Record<string, string> = {
+    low: "bg-yellow-50 text-yellow-700 border-yellow-200/80 dark:bg-yellow-950/30 dark:text-yellow-400 dark:border-yellow-800/40",
+    medium:
+      "bg-orange-50 text-orange-700 border-orange-200/80 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-800/40",
+    high: "bg-red-50 text-red-700 border-red-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800/40",
   };
 
+  const color = levelColors[r.level] || levelColors.medium;
+
   return (
-    <section className="mb-8 space-y-4">
-      <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-        <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200">
-            Construction Schedule
-          </h2>
-          <span className="text-sm text-zinc-500">
-            {total} days (~{(total / 30).toFixed(1)} months)
-          </span>
-        </div>
-        <p className="mb-4 text-sm text-zinc-500">
-          {fmtDate(schedule.startDate)} → {fmtDate(schedule.endDate)}
+    <li
+      className={`rounded-xl border bg-white p-4 dark:bg-charcoal-800 ${color.split(" ")[2] || "border-stone-200/80 dark:border-zinc-800"}`}
+    >
+      <div className="mb-1 flex items-center gap-2">
+        <span
+          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${color.split(" ").slice(0, 2).join(" ")}`}
+        >
+          {r.level}
+        </span>
+        <span className="text-sm font-semibold text-charcoal-800 dark:text-stone-200">
+          {r.title}
+        </span>
+      </div>
+      {expanded && r.description && (
+        <p className="text-sm text-stone-600 dark:text-zinc-400">
+          {r.description}
         </p>
-
-        {/* Gantt bars */}
-        <div className="space-y-1.5">
-          {phases.map((phase, i) => {
-            const left = total > 0 ? (phase.startDay / total) * 100 : 0;
-            const width = total > 0 ? (phase.durationDays / total) * 100 : 0;
-            const color = categoryColors[phase.category] || "bg-zinc-500";
-            const isCritical = criticalPath.includes(phase.id);
-
-            return (
-              <div key={i} className="flex items-center gap-2 text-xs">
-                <span className="w-32 shrink-0 truncate text-right text-zinc-600 dark:text-zinc-400" title={phase.name}>
-                  {phase.name}
-                </span>
-                <div className="relative flex-1 h-6">
-                  <div
-                    className={`absolute top-0 h-full rounded ${color} ${isCritical ? "ring-2 ring-red-400" : ""} flex items-center px-2 text-white font-medium truncate`}
-                    style={{
-                      left: `${left}%`,
-                      width: `${Math.max(width, 2)}%`,
-                    }}
-                    title={`${phase.name} — Day ${phase.startDay} to ${phase.endDay}`}
-                  >
-                    {phase.durationDays}d
-                  </div>
-                </div>
-                {phase.weatherSensitive && (
-                  <span className="shrink-0 text-amber-500" title="Weather sensitive">☂</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="mt-4 flex flex-wrap gap-3 text-xs text-zinc-500">
-          {Object.entries(categoryColors).map(([cat, color]) => (
-            <span key={cat} className="flex items-center gap-1">
-              <span className={`inline-block h-2.5 w-2.5 rounded ${color}`} />
-              {cat}
-            </span>
-          ))}
-          <span className="flex items-center gap-1">
-            <span className="inline-block h-2.5 w-2.5 rounded border-2 border-red-400" />
-            critical
-          </span>
-          <span>☂ weather-sensitive</span>
-        </div>
-      </div>
-
-      {/* Phase details */}
-      <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-        <h3 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-          Phase Details
-        </h3>
-        <div className="space-y-3">
-          {phases.map((phase, i) => {
-            const totalManDays = phase.laborByTrade?.reduce(
-              (s: number, l: any) => s + l.manDays,
-              0
-            ) || 0;
-            const totalWorkers = phase.laborByTrade?.reduce(
-              (s: number, l: any) => s + l.workers,
-              0
-            ) || 0;
-            const isCritical = criticalPath.includes(phase.id);
-
-            return (
-              <div
-                key={i}
-                className={`rounded border p-3 ${isCritical ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20" : "border-zinc-200 dark:border-zinc-700"}`}
-              >
-                <div className="mb-1 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`inline-block h-2.5 w-2.5 rounded ${categoryColors[phase.category] || "bg-zinc-500"}`}
-                    />
-                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                      {phase.name}
-                    </span>
-                    {isCritical && (
-                      <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
-                        CRITICAL
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-zinc-500">
-                    Day {phase.startDay}–{phase.endDay}
-                  </span>
-                </div>
-                {phase.description && (
-                  <p className="mb-1 text-xs text-zinc-600 dark:text-zinc-400">
-                    {phase.description}
-                  </p>
-                )}
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-zinc-500">
-                  <span>Duration: {phase.durationDays}d</span>
-                  {totalWorkers > 0 && <span>Crew: {totalWorkers} workers</span>}
-                  {totalManDays > 0 && <span>Effort: {totalManDays} man-days</span>}
-                  {phase.dependsOn?.length > 0 && (
-                    <span>Depends on: {phase.dependsOn.join(", ")}</span>
-                  )}
-                </div>
-                {phase.keyMaterials?.length > 0 && (
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {phase.keyMaterials.map((m: string, j: number) => (
-                      <span
-                        key={j}
-                        className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                      >
-                        {m}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {phase.laborByTrade?.length > 0 && (
-                  <div className="mt-1 text-xs text-zinc-500">
-                    {phase.laborByTrade.map((l: any, j: number) => (
-                      <span key={j} className="mr-3">
-                        {l.trade}: {l.workers}p × {l.manDays}md
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Critical path */}
-      {criticalPath.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
-          <h3 className="mb-2 text-sm font-semibold text-red-700 dark:text-red-400">
-            Critical Path
-          </h3>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">
-            {criticalPath.join(" → ")}
-          </p>
-          <p className="mt-1 text-xs text-zinc-500">
-            Delays in any of these phases will extend the project completion date.
-          </p>
-        </div>
       )}
-
-      {/* Schedule risk factors */}
-      {riskFactors.length > 0 && (
-        <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
-          <h3 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-            Schedule Risks
-          </h3>
-          <ul className="space-y-2">
-            {riskFactors.map((r: any, i: number) => {
-              const levelColors: Record<string, string> = {
-                low: "bg-yellow-100 text-yellow-800",
-                medium: "bg-orange-100 text-orange-800",
-                high: "bg-red-100 text-red-800",
-              };
-              return (
-                <li key={i} className="rounded border border-zinc-200 dark:border-zinc-700 p-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${levelColors[r.level]}`}>
-                      {r.level}
-                    </span>
-                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                      {r.title}
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">{r.description}</p>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      {/* Notes */}
-      {notes.length > 0 && (
-        <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-          <h3 className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Notes</h3>
-          <ul className="list-inside list-disc space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
-            {notes.map((n: string, i: number) => (
-              <li key={i}>{n}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
+    </li>
   );
 }
